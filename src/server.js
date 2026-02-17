@@ -13,6 +13,7 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { registerWaitlistRoutes } from './waitlist.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
