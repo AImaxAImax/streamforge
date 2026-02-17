@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamForge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #1a1a1f;
+      --surface2: #22222a;
+      --border: #2e2e3a;
+      --text: #e8e8f0;
+      --text-dim: #7a7a8c;
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.2);
+      --youtube: #ff0000;
+      --twitch: #9146ff;
+      --tiktok: #fe2c55;
+      --instagram: #e1306c;
+      --highlight: #f59e0b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--text); }
+
+    .status-bar {
+      display: flex;
+      gap: 16px;
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #666;
+      margin-right: 4px;
+    }
+    .status-dot.online { background: #22c55e; }
+
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      overflow: hidden;
+    }
+
+    .feed {
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .comment {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      gap: 12px;
+      animation: slideIn 0.2s ease;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .comment:hover { border-color: var(--accent); }
+
+    .comment.highlighted {
+      border-color: var(--highlight);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .comment.pinned {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .platform-badge {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .platform-badge.youtube { background: var(--youtube); }
+    .platform-badge.twitch { background: var(--twitch); }
+    .platform-badge.tiktok { background: var(--tiktok); }
+    .platform-badge.instagram { background: var(--instagram); }
+
+    .comment-body { flex: 1; min-width: 0; }
+
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .author {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .timestamp {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+
+    .message {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .comment:hover .comment-actions { opacity: 1; }
+
+    .action-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .sidebar {
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 10px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .platform-stats { display: flex; flex-direction: column; gap: 6px; }
+
+    .platform-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .platform-count { margin-left: auto; color: var(--text-dim); font-size: 12px; }
+
+    .controls { padding: 16px; }
+
+    .btn {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.15s;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.danger:hover { border-color: #ef4444; color: #ef4444; }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 14px;
+      gap: 8px;
+    }
+
+    .empty-icon { font-size: 48px; }
+
+    .highlight-queue {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .highlight-card {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid var(--highlight);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Stream<span>Forge</span></div>
+  <div class="status-bar">
+    <span><span class="status-dot" id="ws-dot"></span>Server</span>
+    <span><span class="status-dot" id="vmix-dot"></span>vMix</span>
+    <span id="feed-count">0 comments</span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Feed -->
+  <div class="feed" id="feed">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📡</div>
+      <div>Waiting for comments...</div>
+      <div style="font-size:12px">Configure platforms in .env to connect live streams</div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Stats -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Live Stats</div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-approved">0</div>
+          <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-blocked">0</div>
+          <div class="stat-label">Blocked</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-rate">0%</div>
+          <div class="stat-label">Pass Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform breakdown -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">By Platform</div>
+      <div class="platform-stats" id="platform-stats"></div>
+    </div>
+
+    <!-- Highlighted queue -->
+    <div class="sidebar-section" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
+      <div class="sidebar-title">⭐ Highlighted</div>
+      <div class="highlight-queue" id="highlight-queue">
+        <div style="color:var(--text-dim); font-size:12px;">AI-selected highlights appear here</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn" onclick="clearFeed()">Clear Feed</button>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px; text-align:center;">
+        vMix data source: <code>http://localhost:4242/vmix/feed.xml</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PLATFORM_ICONS = { youtube: 'YT', twitch: 'TW', tiktok: 'TK', instagram: 'IG' };
+  let comments = [];
+  let stats = {};
+  let ws;
+
+  function connect() {
+    ws = new WebSocket(`ws://${location.host}`);
+
+    ws.onopen = () => {
+      document.getElementById('ws-dot').className = 'status-dot online';
+    };
+
+    ws.onclose = () => {
+      document.getElementById('ws-dot').className = 'status-dot';
+      setTimeout(connect, 2000);
+    };
+
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      handleMessage(msg);
+    };
+  }
+
+  function handleMessage(msg) {
+    switch (msg.type) {
+      case 'init':
+        comments = msg.feed || [];
+        updateStats(msg.stats || {});
+        renderFeed();
+        break;
+      case 'comment':
+        comments.unshift(msg.comment);
+        if (comments.length > 50) comments = comments.slice(0, 50);
+        prependComment(msg.comment);
+        break;
+      case 'highlighted':
+        addHighlight(msg.comment);
+        break;
+      case 'stats':
+        updateStats(msg.stats);
+        break;
+      case 'cleared':
+        comments = [];
+        renderFeed();
+        document.getElementById('highlight-queue').innerHTML =
+          '<div style="color:var(--text-dim); font-size:12px;">AI-selected highlights appear here</div>';
+        break;
+    }
+  }
+
+  function renderFeed() {
+    const feed = document.getElementById('feed');
+    const empty = document.getElementById('empty-state');
+
+    if (comments.length === 0) {
+      feed.innerHTML = '';
+      feed.appendChild(empty);
+      return;
+    }
+
+    empty.remove();
+    feed.innerHTML = comments.map(commentHTML).join('');
+    document.getElementById('feed-count').textContent = `${comments.length} comments`;
+  }
+
+  function prependComment(comment) {
+    const feed = document.getElementById('feed');
+    const empty = document.getElementById('empty-state');
+    empty.remove();
+
+    const div = document.createElement('div');
+    div.innerHTML = commentHTML(comment);
+    feed.insertBefore(div.firstElementChild, feed.firstChild);
+    document.getElementById('feed-count').textContent = `${comments.length} comments`;
+  }
+
+  function commentHTML(c) {
+    const icon = PLATFORM_ICONS[c.platform] || '??';
+    const time = new Date(c.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const classes = ['comment', c.highlighted ? 'highlighted' : '', c.pinned ? 'pinned' : ''].join(' ');
+
+    return `<div class="${classes}" data-id="${c.id}">
+      <div class="platform-badge ${c.platform}">${icon}</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="author">${esc(c.author)}</span>
+          <span class="timestamp">${time}</span>
+        </div>
+        <div class="message">${esc(c.message)}</div>
+        <div class="comment-actions">
+          <button class="action-btn" onclick="highlightComment('${c.id}')">⭐ Highlight</button>
+          <button class="action-btn" onclick="pinComment('${c.id}')">📌 Pin to vMix</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function addHighlight(c) {
+    const queue = document.getElementById('highlight-queue');
+    if (queue.querySelector('[style]')) queue.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'highlight-card';
+    div.innerHTML = `<strong>${esc(c.author)}</strong>: ${esc(c.message)}`;
+    queue.insertBefore(div, queue.firstChild);
+  }
+
+  function updateStats(s) {
+    stats = s;
+    document.getElementById('stat-total').textContent = s.total || 0;
+    document.getElementById('stat-approved').textContent = s.approved || 0;
+    document.getElementById('stat-blocked').textContent = s.blocked || 0;
+    document.getElementById('stat-rate').textContent = (s.approvalRate || 0) + '%';
+
+    const ps = document.getElementById('platform-stats');
+    ps.innerHTML = Object.entries(s.byPlatform || {}).map(([p, n]) =>
+      `<div class="platform-row">
+        <div class="platform-badge ${p}" style="width:18px;height:18px;font-size:9px;">${PLATFORM_ICONS[p]||'?'}</div>
+        <span style="text-transform:capitalize">${p}</span>
+        <span class="platform-count">${n}</span>
+      </div>`
+    ).join('') || '<div style="color:var(--text-dim);font-size:12px;">No platforms active</div>';
+  }
+
+  function highlightComment(id) {
+    ws.send(JSON.stringify({ type: 'highlight', id }));
+  }
+
+  function pinComment(id) {
+    ws.send(JSON.stringify({ type: 'pin', id }));
+  }
+
+  function clearFeed() {
+    if (confirm('Clear all comments?')) {
+      ws.send(JSON.stringify({ type: 'clear' }));
+    }
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  connect();
+</script>
+</body>
+</html>
