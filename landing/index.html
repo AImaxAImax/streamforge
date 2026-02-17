@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamForge — Modern Social Media for Live Production</title>
+  <meta name="description" content="AI-powered social media aggregator for vMix. Replace vMix Social with something that actually works.">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08080a;
+      --surface: #111116;
+      --border: #1e1e26;
+      --text: #f0f0f8;
+      --text-dim: #6e6e80;
+      --accent: #6366f1;
+      --accent2: #818cf8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent2); text-decoration: none; }
+
+    nav {
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .logo span { color: var(--text); }
+
+    .nav-links {
+      margin-left: auto;
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 80px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(99,102,241,0.15);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: var(--accent2);
+      font-size: 13px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+
+    h1 .accent { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-dim);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .waitlist-form {
+      display: flex;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto 16px;
+    }
+
+    .waitlist-form input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .waitlist-form input:focus { border-color: var(--accent); }
+    .waitlist-form input::placeholder { color: var(--text-dim); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+
+    .hero-note {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* Platform badges */
+    .platforms {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .platform-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+
+    .platform-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Screenshot mockup */
+    .mockup-section {
+      padding: 40px 20px 80px;
+      text-align: center;
+    }
+
+    .mockup {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    }
+
+    .mockup-bar {
+      background: #0d0d0f;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mockup-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    .mockup-body {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      min-height: 300px;
+    }
+
+    .mockup-feed {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-right: 1px solid var(--border);
+    }
+
+    .mock-comment {
+      background: #0d0d0f;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .mock-comment .mc-header { color: var(--text-dim); font-size: 11px; margin-bottom: 4px; }
+    .mock-comment.highlighted { border-color: #f59e0b; background: rgba(245,158,11,0.05); }
+    .mockup-sidebar { padding: 16px; }
+    .mockup-stat { margin-bottom: 12px; }
+    .mockup-stat .label { font-size: 11px; color: var(--text-dim); }
+    .mockup-stat .value { font-size: 24px; font-weight: 700; color: var(--accent); }
+
+    /* Features */
+    .features {
+      padding: 80px 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 60px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .feature-icon { font-size: 28px; margin-bottom: 16px; }
+    .feature-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+    /* Comparison */
+    .comparison {
+      padding: 80px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .comp-table th {
+      background: var(--surface);
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-table th:last-child { color: var(--accent); }
+
+    .comp-table td {
+      padding: 14px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+    .check { color: #22c55e; }
+    .cross { color: #ef4444; }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      padding: 100px 20px;
+      background: radial-gradient(ellipse at center, rgba(99,102,241,0.1) 0%, transparent 70%);
+    }
+
+    .cta h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 700; margin-bottom: 16px; }
+    .cta p { color: var(--text-dim); font-size: 18px; margin-bottom: 40px; }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-dim);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+
+    #success-msg { display: none; color: #22c55e; font-size: 14px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Stream<span>Forge</span></div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#compare">vs vMix Social</a>
+    <a href="https://github.com/yourusername/streamforge">GitHub</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">Currently in beta — join the waitlist</div>
+  <h1>Social media for live<br>production that <span class="accent">actually works</span></h1>
+  <p class="hero-sub">
+    Replace vMix Social with an AI-powered aggregator that handles YouTube, Twitch, TikTok, and more — with built-in content moderation.
+  </p>
+
+  <form class="waitlist-form" onsubmit="joinWaitlist(event)">
+    <input type="email" id="email" placeholder="your@email.com" required>
+    <button type="submit" class="btn-primary">Join Waitlist</button>
+  </form>
+  <p class="hero-note">Free during beta. No credit card required.</p>
+  <p id="success-msg">✅ You're on the list! We'll email you when StreamForge launches.</p>
+
+  <div class="platforms">
+    <div class="platform-pill"><div class="platform-dot" style="background:#ff0000"></div>YouTube</div>
+    <div class="platform-pill"><div class="platform-dot" style="background:#9146ff"></div>Twitch</div>
+    <div class="platform-pill"><div class="platform-dot" style="background:#fe2c55"></div>TikTok</div>
+    <div class="platform-pill"><div class="platform-dot" style="background:#e1306c"></div>Instagram</div>
+    <div class="platform-pill"><div class="platform-dot" style="background:#1da1f2"></div>X / Twitter</div>
+    <div class="platform-pill" style="border-style:dashed; color:var(--text-dim)">+ more coming</div>
+  </div>
+</section>
+
+<!-- App mockup -->
+<div class="mockup-section">
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="mockup-dot" style="background:#ff5f57"></div>
+      <div class="mockup-dot" style="background:#febc2e"></div>
+      <div class="mockup-dot" style="background:#28c840"></div>
+      <div style="margin-left:8px;font-size:12px;color:var(--text-dim)">StreamForge — Sunday Service</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-feed">
+        <div class="mock-comment highlighted">
+          <div class="mc-header">⭐ ChurchTech42 · YouTube</div>
+          <div>What camera setup are you using today? The quality is incredible</div>
+        </div>
+        <div class="mock-comment">
+          <div class="mc-header">StreamNerd · Twitch</div>
+          <div>Great production quality 🙏</div>
+        </div>
+        <div class="mock-comment">
+          <div class="mc-header">viewer123 · TikTok</div>
+          <div>How do you handle the NDI routing for multi-cam?</div>
+        </div>
+        <div class="mock-comment">
+          <div class="mc-header">TechDirector · YouTube</div>
+          <div>Can you share your vMix template?</div>
+        </div>
+      </div>
+      <div class="mockup-sidebar">
+        <div class="mockup-stat">
+          <div class="label">Comments</div>
+          <div class="value">247</div>
+        </div>
+        <div class="mockup-stat">
+          <div class="label">Pass Rate</div>
+          <div class="value">94%</div>
+        </div>
+        <div class="mockup-stat">
+          <div class="label">Blocked</div>
+          <div class="value" style="color:#ef4444">14</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything vMix Social should be</h2>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">AI Content Moderation</div>
+      <div class="feature-desc">Local LLM filters spam, profanity, and harassment before it hits your broadcast. Church mode for family-friendly productions. Runs entirely on your machine — no cloud.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📡</div>
+      <div class="feature-title">Multi-Platform Aggregation</div>
+      <div class="feature-desc">YouTube, Twitch, TikTok, Instagram, X — one unified feed. See everything your audience is saying across every platform in real time.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎬</div>
+      <div class="feature-title">Native vMix Integration</div>
+      <div class="feature-desc">Pushes to vMix via XML Data Source and HTTP API. Works with any vMix title template. No scripting required — just point vMix at the data source URL.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⭐</div>
+      <div class="feature-title">AI Comment Highlights</div>
+      <div class="feature-desc">AI automatically surfaces the most engaging questions and comments. One-click push to vMix lower third. Your TD can stay focused on the show.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📌</div>
+      <div class="feature-title">Pin & Queue System</div>
+      <div class="feature-desc">Pin comments to display at the right moment. Build a queue for live Q&A segments. Reply tracking so you never lose a question in the flood.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Runs Locally</div>
+      <div class="feature-desc">Installs on your production PC. No cloud subscription, no data leaving your network. Church mode with strict filtering keeps sensitive shows clean.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section class="comparison" id="compare">
+  <div class="section-label">Comparison</div>
+  <h2 class="section-title">Why not just use vMix Social?</h2>
+
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>vMix Social</th>
+        <th>StreamForge</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>TikTok Live support</td>
+        <td class="cross">✗ Not supported</td>
+        <td class="check">✓ Yes</td>
+      </tr>
+      <tr>
+        <td>AI content moderation</td>
+        <td class="cross">✗ None</td>
+        <td class="check">✓ Local LLM</td>
+      </tr>
+      <tr>
+        <td>Comment highlighting</td>
+        <td class="cross">✗ Manual only</td>
+        <td class="check">✓ AI-powered</td>
+      </tr>
+      <tr>
+        <td>Multi-platform unified feed</td>
+        <td class="cross">✗ One at a time</td>
+        <td class="check">✓ All platforms together</td>
+      </tr>
+      <tr>
+        <td>Real-time dashboard</td>
+        <td class="cross">✗ In-vMix only</td>
+        <td class="check">✓ Any browser</td>
+      </tr>
+      <tr>
+        <td>Church/strict mode</td>
+        <td class="cross">✗ No filtering</td>
+        <td class="check">✓ Configurable</td>
+      </tr>
+      <tr>
+        <td>Last updated</td>
+        <td class="cross">✗ 2019</td>
+        <td class="check">✓ 2026</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Ready to fix your social media workflow?</h2>
+  <p>Join the waitlist. Free during beta.</p>
+
+  <form class="waitlist-form" style="justify-content:center" onsubmit="joinWaitlist(event)">
+    <input type="email" id="email2" placeholder="your@email.com" required>
+    <button type="submit" class="btn-primary">Join Waitlist</button>
+  </form>
+</section>
+
+<footer>
+  <p>StreamForge — Built for the vMix community by someone who's actually run live productions.</p>
+  <p style="margin-top:8px"><a href="https://github.com/yourusername/streamforge">GitHub</a> · <a href="mailto:hello@streamforge.io">Contact</a></p>
+</footer>
+
+<script>
+  function joinWaitlist(e) {
+    e.preventDefault();
+    const email = document.getElementById('email')?.value || document.getElementById('email2')?.value;
+    // TODO: hook up to email service (Mailchimp, ConvertKit, etc.)
+    // For now, just show success message
+    document.getElementById('success-msg').style.display = 'block';
+    console.log('Waitlist signup:', email);
+    // In production: POST to /api/waitlist or your email service
+  }
+</script>
+</body>
+</html>
